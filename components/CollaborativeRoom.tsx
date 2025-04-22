@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
 import { ClientSideSuspense, RoomProvider } from '@liveblocks/react/suspense'
-import React, { useEffect, useRef, useState } from 'react'
 import { Editor } from '@/components/editor/Editor'
 import Header from '@/components/Header'
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
 import ActiveCollaborators from './ActiveCollaborators';
+import { useEffect, useRef, useState } from 'react';
 import { Input } from './ui/input';
-import { updateDocument } from '@/lib/actions/room.actions';
 import Image from 'next/image';
+import { updateDocument } from '@/lib/actions/room.actions';
 import Loader from './Loader';
+// import ShareModal from './ShareModal';
 
-const CollaborativeRoom = ({ roomId, roomMetadata }: CollaborativeRoomProps) => {
-    const currentUserType = "editor"
+const CollaborativeRoom = ({ roomId, roomMetadata, users, currentUserType }: CollaborativeRoomProps) => {
     const [documentTitle, setDocumentTitle] = useState(roomMetadata.title);
     const [editing, setEditing] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -61,28 +61,30 @@ const CollaborativeRoom = ({ roomId, roomMetadata }: CollaborativeRoomProps) => 
         }
     }, [editing])
 
+
     return (
         <RoomProvider id={roomId}>
-            <ClientSideSuspense fallback={<Loader/>}>
-                <div className='collaborative-room'>
+            <ClientSideSuspense fallback={<Loader />}>
+                <div className="collaborative-room">
                     <Header>
-                        <div ref={containerRef} className='flex w-fit items-center justify-center gap-2'>
+                        <div ref={containerRef} className="flex w-fit items-center justify-center gap-2">
                             {editing && !loading ? (
                                 <Input
                                     type="text"
                                     value={documentTitle}
-                                    ref={inputRef as unknown as React.LegacyRef<HTMLInputElement>}
+                                    ref={inputRef}
                                     placeholder="Enter title"
                                     onChange={(e) => setDocumentTitle(e.target.value)}
                                     onKeyDown={updateTitleHandler}
-                                    disabled={!editing}
+                                    disable={!editing}
                                     className="document-title-input"
                                 />
                             ) : (
                                 <>
-                                    <p>{documentTitle}</p>
+                                    <p className="document-title">{documentTitle}</p>
                                 </>
                             )}
+
                             {currentUserType === 'editor' && !editing && (
                                 <Image
                                     src="/assets/icons/edit.svg"
@@ -100,8 +102,16 @@ const CollaborativeRoom = ({ roomId, roomMetadata }: CollaborativeRoomProps) => 
 
                             {loading && <p className="text-sm text-gray-400">saving...</p>}
                         </div>
-                        <div className='flex w-full flex-1 justify-end gap-2 sm:gap-3'>
+                        <div className="flex w-full flex-1 justify-end gap-2 sm:gap-3">
                             <ActiveCollaborators />
+
+                            {/* <ShareModal
+                                roomId={roomId}
+                                collaborators={users}
+                                creatorId={roomMetadata.creatorId}
+                                currentUserType={currentUserType}
+                            /> */}
+
                             <SignedOut>
                                 <SignInButton />
                             </SignedOut>
@@ -110,7 +120,7 @@ const CollaborativeRoom = ({ roomId, roomMetadata }: CollaborativeRoomProps) => 
                             </SignedIn>
                         </div>
                     </Header>
-                    <Editor />
+                    <Editor roomId={roomId} currentUserType={currentUserType} />
                 </div>
             </ClientSideSuspense>
         </RoomProvider>
