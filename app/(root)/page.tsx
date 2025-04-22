@@ -9,6 +9,7 @@ import { currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import { getDocuments } from '@/lib/actions/room.actions'
 import Link from 'next/link'
+import { dateConverter } from '@/lib/utils'
 
 const Home = async () => {
   const clerkUser = await currentUser()
@@ -50,7 +51,7 @@ const Home = async () => {
                     </div>
                     <div className="space-y-1">
                       <p className="line-clamp-1 text-lg">{metadata.title}</p>
-                      {/* <p className="text-sm font-light text-blue-100">Created about {dateConverter(createdAt)}</p> */}
+                      <p className="text-sm font-light text-blue-100">Created about {dateConverter(createdAt)}</p>
                     </div>
                   </Link>
                   {/* <DeleteModal roomId={id} /> */}
