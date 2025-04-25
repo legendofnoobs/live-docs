@@ -5,11 +5,12 @@ import { Editor } from '@/components/editor/Editor'
 import Header from '@/components/Header'
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
 import ActiveCollaborators from './ActiveCollaborators';
-import { useEffect, useRef, useState } from 'react';
+import { LegacyRef, useEffect, useRef, useState } from 'react';
 import { Input } from './ui/input';
 import Image from 'next/image';
 import { updateDocument } from '@/lib/actions/room.actions';
 import Loader from './Loader';
+import ShareModal from './ShareModal';
 // import ShareModal from './ShareModal';
 
 const CollaborativeRoom = ({ roomId, roomMetadata, users, currentUserType }: CollaborativeRoomProps) => {
@@ -47,7 +48,6 @@ const CollaborativeRoom = ({ roomId, roomMetadata, users, currentUserType }: Col
                 updateDocument(roomId, documentTitle);
             }
         }
-
         document.addEventListener('mousedown', handleClickOutside);
 
         return () => {
@@ -61,7 +61,6 @@ const CollaborativeRoom = ({ roomId, roomMetadata, users, currentUserType }: Col
         }
     }, [editing])
 
-
     return (
         <RoomProvider id={roomId}>
             <ClientSideSuspense fallback={<Loader />}>
@@ -72,11 +71,11 @@ const CollaborativeRoom = ({ roomId, roomMetadata, users, currentUserType }: Col
                                 <Input
                                     type="text"
                                     value={documentTitle}
-                                    ref={inputRef}
+                                    ref={inputRef as unknown as LegacyRef<HTMLInputElement>}
                                     placeholder="Enter title"
                                     onChange={(e) => setDocumentTitle(e.target.value)}
                                     onKeyDown={updateTitleHandler}
-                                    disable={!editing}
+                                    disabled={!editing}
                                     className="document-title-input"
                                 />
                             ) : (
@@ -105,12 +104,12 @@ const CollaborativeRoom = ({ roomId, roomMetadata, users, currentUserType }: Col
                         <div className="flex w-full flex-1 justify-end gap-2 sm:gap-3">
                             <ActiveCollaborators />
 
-                            {/* <ShareModal
+                            <ShareModal
                                 roomId={roomId}
                                 collaborators={users}
                                 creatorId={roomMetadata.creatorId}
                                 currentUserType={currentUserType}
-                            /> */}
+                            />
 
                             <SignedOut>
                                 <SignInButton />
